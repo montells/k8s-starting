@@ -6,6 +6,14 @@ require 'sinatra'
 set :port, 8080
 set :bind, '0.0.0.0'
 
+allowed_hosts = ENV.fetch("ALLOWED_HOSTS", "sinatra-app.example")
+
+unless allowed_hosts.empty?
+  set :host_authorization, {
+    permitted_hosts: allowed_hosts.split(",")
+  }
+end
+
 # Root route - renders the index template
 get '/' do
   @message = ENV.fetch('APP_MESSAGE', 'Hola desde K8s!')
