@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sinatra-app-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: sinatra-app.example
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sinatra-app-svc
+                port:
+                  number: 8080
