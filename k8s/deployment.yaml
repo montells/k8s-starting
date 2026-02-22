@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sinatra-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sinatra-app
+  template:
+    metadata:
+      labels:
+        app: sinatra-app
+    spec:
+      containers:
+      - name: sinatra-app-container
+        image: sinatra-app:latest    
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
