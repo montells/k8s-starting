@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sinatra-app-config
+data:
+  ALLOWED_HOSTS: "sinatra-app.example"
+  APP_MESSAGE: "¡Welcome to the Sinatra app on Kubernetes! Also using ConfigMap for environment variables."
+  APP_ENV: "development"
