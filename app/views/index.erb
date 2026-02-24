@@ -39,6 +39,11 @@
 <body>
   <div class="info">
     <h1><%= @message %></h1>
+
+    <div class="env-var">
+      <span class="label">Code Name:</span>
+      <span class="value">app-sinatra-<%= @version %></span>
+    </div>
     
     <div class="env-var">
       <span class="label">Environment:</span>

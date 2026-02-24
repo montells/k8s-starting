@@ -16,6 +16,7 @@ end
 
 # Root route - renders the index template
 get '/' do
+  @version = '1.0.0'
   @message = ENV.fetch('APP_MESSAGE', 'Hola desde K8s!')
   @environment = ENV.fetch('APP_ENV', 'development')
   @pod_name = ENV.fetch('POD_NAME', 'local-container')
