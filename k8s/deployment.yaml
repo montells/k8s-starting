@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sinatra-app-container
-        image: sinatra-app:1.1.0
+        image: sinatra-app:1.0.0
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
