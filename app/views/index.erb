@@ -59,6 +59,11 @@
       <span class="label">Hostname:</span>
       <span class="value"><%= @hostname %></span>
     </div>
+    
+    <div class="env-var">
+      <span class="label">Visit Count:</span>
+      <span class="value"><%= @visit_count.nil? ? 'N/A' : @visit_count %></span>
+    </div>
   </div>
 </body>
 </html>
