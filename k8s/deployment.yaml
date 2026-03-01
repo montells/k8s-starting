@@ -14,10 +14,17 @@ spec:
     spec:
       containers:
       - name: sinatra-app-container
-        image: sinatra-app:1.0.0
+        image: sinatra-app:1.2.2
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
         envFrom:
         - configMapRef:
             name: sinatra-app-config
+        volumeMounts:
+        - name: sinatra-app-volume
+          mountPath: /data
+      volumes:
+        - name: sinatra-app-volume
+          persistentVolumeClaim:
+            claimName: sinatra-app-pvc

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sinatra-app-pvc
+spec:
+  storageClassName: manual
+  selector:
+    matchLabels:
+      app: sinatra-app
+      type: local
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi  

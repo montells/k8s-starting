@@ -57,7 +57,7 @@ get '/' do
   # Set the count for display (nil if there was an error)
   @visit_count = get_visit_count
   
-  @version = '1.0.0'
+  @version = '1.2.2'
   @message = ENV.fetch('APP_MESSAGE', 'Hola desde K8s!')
   @environment = ENV.fetch('APP_ENV', 'development')
   @pod_name = ENV.fetch('POD_NAME', 'local-container')
