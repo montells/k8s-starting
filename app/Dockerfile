@@ -12,6 +12,7 @@ RUN bundle install --jobs 4 --retry 3
 
 # Copy application code
 COPY app.rb .
+COPY visit_counter.rb .
 COPY views/ views/
 
 # Expose port 8080
