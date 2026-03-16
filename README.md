@@ -8,12 +8,27 @@ Aplicación web mínima con Sinatra (Ruby) para aprender Kubernetes.
 k8s-starting/
 ├── app/
 │   ├── app.rb              # Aplicación Sinatra
+│   ├── version.rb          # Archivo de versión centralizado
 │   ├── Gemfile             # Dependencias Ruby
 │   ├── Dockerfile          # Imagen Docker
 │   └── views/
 │       └── index.erb       # Plantilla HTML
+├── k8s/
+│   └── ...                 # Manifestos K8s
 └── README.md               # Este archivo
 ```
+
+## Gestión de Versiones
+
+La versión de la aplicación se gestiona en un único archivo: [`app/version.rb`](app/version.rb)
+
+```ruby
+module VERSION
+  STRING = '1.4.0'
+end
+```
+
+Para actualizar la versión, solo necesitas modificar este archivo y la aplicación lo utilizará automáticamente.
 
 ## Variables de Entorno
 

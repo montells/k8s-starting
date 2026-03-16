@@ -2,6 +2,7 @@
 
 require 'sinatra'
 require_relative 'visit_counter'
+require_relative 'version'
 
 # Configure server to run on port 8080
 set :port, 8080
@@ -23,7 +24,7 @@ get '/' do
   # Increment the visit count
   @visit_count = visit_counter.increment
 
-  @version = '1.4.0'
+  @version = VERSION::STRING
   @message = ENV.fetch('APP_MESSAGE', 'Hola desde K8s!')
   @environment = ENV.fetch('APP_ENV', 'development')
   @pod_name = ENV.fetch('POD_NAME', 'local-container')
