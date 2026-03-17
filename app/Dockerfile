@@ -14,7 +14,7 @@ COPY Gemfile.lock Gemfile.lock
 RUN bundle install --jobs 4 --retry 3
 
 # Copy application code
-COPY app/ ./app
+COPY . ./app
 
 # Expose port 8080
 EXPOSE 8080

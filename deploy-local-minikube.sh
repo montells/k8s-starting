@@ -26,7 +26,8 @@ echo -e "${GREEN}  Version: $VERSION${NC}"
 
 # Step 2: Build Docker image
 echo -e "${YELLOW}[2/3] Building Docker image sinatra-app:$VERSION...${NC}"
-docker build -t sinatra-app:$VERSION .
+cd app && docker build -t sinatra-app:$VERSION . && cd ..
+
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}  Docker image built successfully${NC}"
