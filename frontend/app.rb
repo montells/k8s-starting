@@ -20,6 +20,13 @@ unless allowed_hosts.empty?
   }
 end
 
+# Fetches and processes backend response
+def fetch_backend_response
+  backend_url = ENV.fetch('BACKEND_URL', 'http://localhost:8081')
+  response = BackendClient.fetch(backend_url, '/')
+  response['message'] || response
+end
+
 # Root route - renders the index template
 get '/' do
   # Increment the visit count
@@ -32,8 +39,7 @@ get '/' do
   @hostname = `hostname`.strip
   
   # Fetch backend response
-  backend_url = ENV.fetch('BACKEND_URL', 'http://localhost:8081')
-  @backend_response = BackendClient.fetch(backend_url, '/')
+  @backend_response = fetch_backend_response
   
   erb :index
 end

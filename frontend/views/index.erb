@@ -39,6 +39,8 @@
     }
     .value.backend {
       color: #006600; /* Verde oscuro para el valor del backend */
+      font-weight: bold;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -73,8 +75,8 @@
     
     <!-- Nuevo elemento: Backend Response -->
     <div class="env-var backend">
-      <span class="label">backend response:</span>
-      <span class="value backend"><%= @backend_response.to_json %></span>
+      <span class="label">Backend Response:</span>
+      <span class="value backend"><%= @backend_response %></span>
     </div>
   </div>
 </body>
