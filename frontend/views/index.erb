@@ -27,12 +27,18 @@
       background-color: #e8f4f8;
       border-radius: 4px;
     }
+    .env-var.backend {
+      background-color: #e8f8e8; /* Verde claro para diferenciar */
+    }
     .label {
       font-weight: bold;
       color: #666;
     }
     .value {
       color: #0066cc;
+    }
+    .value.backend {
+      color: #006600; /* Verde oscuro para el valor del backend */
     }
   </style>
 </head>
@@ -63,6 +69,12 @@
     <div class="env-var">
       <span class="label">Visit Count:</span>
       <span class="value"><%= @visit_count.nil? ? 'N/A' : @visit_count %></span>
+    </div>
+    
+    <!-- Nuevo elemento: Backend Response -->
+    <div class="env-var backend">
+      <span class="label">backend response:</span>
+      <span class="value backend"><%= @backend_response.to_json %></span>
     </div>
   </div>
 </body>

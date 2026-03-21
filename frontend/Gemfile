@@ -2,6 +2,7 @@
 
 source 'https://rubygems.org'
 
+gem 'httparty'
 gem 'puma'
 gem 'rackup'
 gem 'sinatra'

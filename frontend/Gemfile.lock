@@ -2,7 +2,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.3.0)
+    csv (3.3.5)
+    httparty (0.24.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     logger (1.7.0)
+    mini_mime (1.1.5)
+    multi_xml (0.6.0)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.7.5)
@@ -33,6 +40,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  httparty
   puma
   rackup
   sinatra

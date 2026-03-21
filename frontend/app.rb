@@ -3,6 +3,7 @@
 require 'sinatra'
 require_relative 'visit_counter'
 require_relative 'version'
+require_relative 'backend_client'
 
 # Configure server to run on port 8080
 set :port, 8080
@@ -29,6 +30,10 @@ get '/' do
   @environment = ENV.fetch('APP_ENV', 'development')
   @pod_name = ENV.fetch('POD_NAME', 'local-container')
   @hostname = `hostname`.strip
+  
+  # Fetch backend response
+  backend_url = ENV.fetch('BACKEND_URL', 'http://localhost:8081')
+  @backend_response = BackendClient.fetch(backend_url, '/')
   
   erb :index
 end
