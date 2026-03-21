@@ -6,3 +6,4 @@ data:
   ALLOWED_HOSTS: "sinatra-app.example"
   APP_MESSAGE: "¡Welcome to the Sinatra app on Kubernetes! Also using ConfigMap for environment variables."
   APP_ENV: "development"
+  BACKEND_URL: "http://sinatra-backend-svc:8081"
