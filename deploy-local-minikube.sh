@@ -47,8 +47,8 @@ else
 fi
 
 # Step 4: Deploy to Kubernetes using sed pipe (no modification to original file)
-echo -e "${YELLOW}[3/3] Deploying to Kubernetes...${NC}"
-sed "s/\${VERSION}/$VERSION/" k8s/deployment.yaml | kubectl apply -f -
+echo -e "${YELLOW}[4/4] Deploying to Kubernetes...${NC}"
+sed "s/\${VERSION}/$VERSION/" k8s/frontend/deployment.yaml | kubectl apply -f -
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}=== Deployment completed successfully! ===${NC}"

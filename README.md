@@ -29,12 +29,16 @@ k8s-starting/
 │   ├── Gemfile
 │   └── Dockerfile
 ├── k8s/
-│   ├── deployment.yaml         # Frontend deployment (3 replicas)
-│   ├── configMaps.yaml         # Environment variables
-│   ├── sinatra-app-ingress.yaml# Nginx ingress
-│   ├── nodeport.yaml           # NodePort service
-│   ├── fileVolume.yaml         # PersistentVolume for visit counter
-│   └── fileVolumeClaim.yaml    # PersistentVolumeClaim
+│   ├── frontend/
+│   │   ├── deployment.yaml         # Frontend deployment (3 replicas)
+│   │   ├── configMaps.yaml         # Environment variables
+│   │   ├── sinatra-app-ingress.yaml# Nginx ingress
+│   │   ├── nodeport.yaml           # NodePort service
+│   │   ├── fileVolume.yaml         # PersistentVolume for visit counter
+│   │   └── fileVolumeClaim.yaml    # PersistentVolumeClaim
+│   └── backend/
+│       ├── deployment.yaml         # Backend deployment
+│       └── service.yaml            # Backend service
 └── README.md
 ```
 
@@ -92,8 +96,11 @@ docker run -p 8081:8081 sinatra-backend
 ## Kubernetes
 
 ```bash
-# Apply all resources
-kubectl apply -f k8s/
+# Apply frontend resources
+kubectl apply -f k8s/frontend/
+
+# Apply backend resources (once created)
+kubectl apply -f k8s/backend/
 
 # Check status
 kubectl get deployments
@@ -101,7 +108,8 @@ kubectl get pods
 kubectl get ingress
 
 # View logs
-kubectl logs -l app=sinatra-app
+kubectl logs -l app=sinatra-app       # Frontend
+kubectl logs -l app=sinatra-backend   # Backend (once deployed)
 ```
 
 > The frontend is accessible via Ingress at `sinatra-app.example`. The backend communicates internally through K8s Services.

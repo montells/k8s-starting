@@ -30,12 +30,16 @@ k8s-starting/
 │   ├── Gemfile
 │   └── Dockerfile
 ├── k8s/
-│   ├── configMaps.yaml         # ConfigMap for environment variables
-│   ├── deployment.yaml         # K8s Deployment (3 replicas, frontend)
-│   ├── sinatra-app-ingress.yaml# Ingress (nginx, host: sinatra-app.example)
-│   ├── nodeport.yaml           # NodePort Service
-│   ├── fileVolume.yaml         # PersistentVolume for visit counter
-│   └── fileVolumeClaim.yaml    # PersistentVolumeClaim for visit counter
+│   ├── frontend/
+│   │   ├── deployment.yaml         # K8s Deployment (3 replicas)
+│   │   ├── configMaps.yaml         # ConfigMap for environment variables
+│   │   ├── sinatra-app-ingress.yaml# Ingress (nginx, host: sinatra-app.example)
+│   │   ├── nodeport.yaml           # NodePort Service
+│   │   ├── fileVolume.yaml         # PersistentVolume for visit counter
+│   │   └── fileVolumeClaim.yaml    # PersistentVolumeClaim
+│   └── backend/
+│       ├── deployment.yaml         # Backend Deployment (pending)
+│       └── service.yaml            # Backend Service (pending)
 ├── README.md
 └── AGENTS.md
 ```
@@ -88,8 +92,11 @@ curl http://localhost:8081/health
 ### Kubernetes Deployment
 
 ```bash
-# Apply all resources
-kubectl apply -f k8s/
+# Apply frontend resources
+kubectl apply -f k8s/frontend/
+
+# Apply backend resources (once created)
+kubectl apply -f k8s/backend/
 
 # Check deployment status
 kubectl get deployments
@@ -97,8 +104,8 @@ kubectl get pods
 kubectl get ingress
 
 # View logs
-kubectl logs -l app=sinatra-app
-kubectl logs -l app=sinatra-backend
+kubectl logs -l app=sinatra-app       # Frontend
+kubectl logs -l app=sinatra-backend   # Backend (once deployed)
 
 # Port forward for local testing
 kubectl port-forward deployment/sinatra-app-deployment 8080:8080
@@ -109,30 +116,34 @@ kubectl delete -f k8s/
 
 ## Kubernetes Configuration Details
 
-### Frontend Deployment (`k8s/deployment.yaml`)
+### Frontend Deployment (`k8s/frontend/deployment.yaml`)
 - **Replicas**: 3
 - **ImagePullPolicy**: `Never` (for local testing)
 - **Container Port**: 8080
 - **Environment**: Injected from ConfigMap `sinatra-app-config`
 
-### Backend Deployment
-- Still being defined — backend K8s manifests (Deployment + Service) are pending
+### Backend Deployment (`k8s/backend/deployment.yaml` - pending)
+- To be created by you during the study
 - **Container Port**: 8081
 - Will be reachable by the frontend via its K8s Service name (cluster-internal DNS)
 
-### ConfigMap (`k8s/configMaps.yaml`)
+### ConfigMap (`k8s/frontend/configMaps.yaml`)
 - **Name**: `sinatra-app-config`
 - Contains: `ALLOWED_HOSTS`, `APP_MESSAGE`, `APP_ENV`
 
-### Ingress (`k8s/sinatra-app-ingress.yaml`)
+### Ingress (`k8s/frontend/sinatra-app-ingress.yaml`)
 - **Ingress Class**: nginx
 - **Host**: `sinatra-app.example`
 - **Backend Service**: `sinatra-app-svc` on port 8080
 
-### Persistent Storage (visit counter)
+### Persistent Storage (`k8s/frontend/`)
 - `fileVolume.yaml` — PersistentVolume backed by a local host path
 - `fileVolumeClaim.yaml` — PVC bound to the above volume
 - Used by the frontend to persist visit count across pod restarts
+
+### Backend Service (`k8s/backend/service.yaml` - pending)
+- To be created by you during the study
+- Will expose the backend deployment to other pods in the cluster
 
 ## Development Notes
 
