@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a simple Sinatra web application containerized with Docker, designed as a learning project for Kubernetes experiments. The application displays environment variables and serves as a minimal example of deploying Ruby web apps to K8s.
+This is a Kubernetes learning project with two Sinatra (Ruby) applications that communicate with each other inside the same cluster. The **frontend** (`app/`) serves an HTML page with environment info and a visit counter. The **backend** (`backend/`) is a JSON API consumed by the frontend, used to experiment with inter-service communication in K8s.
 
 ## Tech Stack
 
@@ -16,28 +16,49 @@ This is a simple Sinatra web application containerized with Docker, designed as 
 
 ```
 k8s-starting/
-├── app/
-│   ├── app.rb              # Main Sinatra application
-│   ├── Gemfile             # Ruby dependencies
-│   ├── Dockerfile          # Docker image definition
+├── app/                        # Frontend Sinatra app (port 8080)
+│   ├── app.rb                  # Main Sinatra application
+│   ├── version.rb              # Centralized version file
+│   ├── visit_counter.rb        # File-based persistent visit counter
+│   ├── Gemfile
+│   ├── Dockerfile
 │   └── views/
-│       └── index.erb       # HTML template for root route
+│       └── index.erb           # HTML template
+├── backend/                    # Backend Sinatra app (port 8081)
+│   ├── sinatra.rb              # JSON API application
+│   ├── version.rb              # Centralized version file
+│   ├── Gemfile
+│   └── Dockerfile
 ├── k8s/
-│   ├── configMaps.yaml     # ConfigMap for environment variables
-│   ├── deployment.yaml     # K8s Deployment (3 replicas)
-│   └── sinatra-app-ingress.yaml  # Ingress configuration
+│   ├── configMaps.yaml         # ConfigMap for environment variables
+│   ├── deployment.yaml         # K8s Deployment (3 replicas, frontend)
+│   ├── sinatra-app-ingress.yaml# Ingress (nginx, host: sinatra-app.example)
+│   ├── nodeport.yaml           # NodePort Service
+│   ├── fileVolume.yaml         # PersistentVolume for visit counter
+│   └── fileVolumeClaim.yaml    # PersistentVolumeClaim for visit counter
 ├── README.md
 └── AGENTS.md
 ```
 
-## Application Endpoints
+## Applications
+
+### Frontend (`app/`) — port 8080
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /` | Main page displaying environment variables (message, environment, pod name, hostname) |
-| `GET /health` | Health check endpoint for K8s probes, returns `200 OK` |
+| `GET /` | Main page: environment variables + visit counter |
+| `GET /health` | Health check, returns `200 OK` |
 
-## Environment Variables
+### Backend (`backend/`) — port 8081
+
+JSON API, intended to be called by the frontend inside the cluster.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /` | Returns `{"message": "ok"}` |
+| `GET /health` | Returns `{"status": "healthy", "version": "..."}` |
+
+## Environment Variables (Frontend)
 
 | Variable | Description | Default Value |
 |----------|-------------|---------------|
@@ -51,33 +72,24 @@ k8s-starting/
 ### Local Development (Docker)
 
 ```bash
-# Build the Docker image
+# Frontend
 docker build -t sinatra-app ./app
-
-# Run container locally
 docker run -p 8080:8080 sinatra-app
-
-# Run with custom environment variables
-docker run -p 8080:8080 \
-  -e APP_MESSAGE="Hola desde Docker!" \
-  -e APP_ENV="production" \
-  sinatra-app
-
-# Test the application
 curl http://localhost:8080
 curl http://localhost:8080/health
+
+# Backend
+docker build -t sinatra-backend ./backend
+docker run -p 8081:8081 sinatra-backend
+curl http://localhost:8081
+curl http://localhost:8081/health
 ```
 
 ### Kubernetes Deployment
 
 ```bash
-# Build and tag the image
-docker build -t sinatra-app:1.1.0 ./app
-
-# Apply K8s resources
-kubectl apply -f k8s/configMaps.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/sinatra-app-ingress.yaml
+# Apply all resources
+kubectl apply -f k8s/
 
 # Check deployment status
 kubectl get deployments
@@ -86,6 +98,7 @@ kubectl get ingress
 
 # View logs
 kubectl logs -l app=sinatra-app
+kubectl logs -l app=sinatra-backend
 
 # Port forward for local testing
 kubectl port-forward deployment/sinatra-app-deployment 8080:8080
@@ -96,12 +109,16 @@ kubectl delete -f k8s/
 
 ## Kubernetes Configuration Details
 
-### Deployment (`k8s/deployment.yaml`)
+### Frontend Deployment (`k8s/deployment.yaml`)
 - **Replicas**: 3
-- **Image**: `sinatra-app:1.1.0`
 - **ImagePullPolicy**: `Never` (for local testing)
 - **Container Port**: 8080
 - **Environment**: Injected from ConfigMap `sinatra-app-config`
+
+### Backend Deployment
+- Still being defined — backend K8s manifests (Deployment + Service) are pending
+- **Container Port**: 8081
+- Will be reachable by the frontend via its K8s Service name (cluster-internal DNS)
 
 ### ConfigMap (`k8s/configMaps.yaml`)
 - **Name**: `sinatra-app-config`
@@ -112,17 +129,20 @@ kubectl delete -f k8s/
 - **Host**: `sinatra-app.example`
 - **Backend Service**: `sinatra-app-svc` on port 8080
 
-> **Note**: The Service resource (`sinatra-app-svc`) referenced in the Ingress is not defined in the current K8s manifests. You may need to create it separately.
+### Persistent Storage (visit counter)
+- `fileVolume.yaml` — PersistentVolume backed by a local host path
+- `fileVolumeClaim.yaml` — PVC bound to the above volume
+- Used by the frontend to persist visit count across pod restarts
 
 ## Development Notes
 
-- The application runs on port **8080** and binds to `0.0.0.0`
-- Uses `frozen_string_literal` pragma for performance optimization
-- Host authorization is configured based on `ALLOWED_HOSTS` environment variable
-- The Dockerfile uses `ruby:3.2-alpine` base image for minimal size
-- Build tools (`build-base`) are installed for compiling native gem extensions
+- Frontend runs on port **8080**, backend on **8081**, both bind to `0.0.0.0`
+- Both apps use `frozen_string_literal` pragma
+- Both Dockerfiles use `ruby:3.2-alpine` for minimal image size
+- Frontend: host authorization configured via `ALLOWED_HOSTS` env var
+- Visit counter persists to a file; requires a PVC when running in K8s
 
-## Dependencies
+## Dependencies (both apps)
 
 - **sinatra**: Web framework
 - **puma**: HTTP web server
@@ -130,9 +150,9 @@ kubectl delete -f k8s/
 
 ## Potential Improvements
 
-1. Add a K8s Service manifest (`service.yaml`) to expose the deployment
-2. Add liveness and readiness probes to the deployment
-3. Implement resource limits and requests in the deployment
-4. Add a `.dockerignore` file to optimize build context
-5. Consider adding tests for the application
+1. Add K8s Deployment + Service manifests for the backend
+2. Configure frontend to call the backend via its K8s Service DNS name
+3. Add liveness and readiness probes to both deployments
+4. Implement resource limits and requests
+5. Add a `.dockerignore` to both apps
 6. Implement CI/CD pipeline for automated builds and deployments

@@ -1,78 +1,107 @@
 # Sinatra K8s App
 
-Aplicación web mínima con Sinatra (Ruby) para aprender Kubernetes.
+A Kubernetes learning project with two Sinatra (Ruby) applications that communicate with each other within the same cluster.
 
-## Estructura del Proyecto
+## Architecture
+
+```
+Internet → Ingress → sinatra-app (frontend, :8080) → sinatra-backend (:8081)
+```
+
+- **`app/`** — Frontend: serves HTML, displays environment variables and visit counter
+- **`backend/`** — Backend: JSON API, intended to be consumed by the frontend within the cluster
+
+## Project Structure
 
 ```
 k8s-starting/
-├── app/
-│   ├── app.rb              # Aplicación Sinatra
-│   ├── version.rb          # Archivo de versión centralizado
-│   ├── Gemfile             # Dependencias Ruby
-│   ├── Dockerfile          # Imagen Docker
+├── app/                        # Frontend Sinatra app
+│   ├── app.rb                  # Sinatra application
+│   ├── version.rb              # Centralized version file
+│   ├── visit_counter.rb        # File-based persistent visit counter
+│   ├── Gemfile
+│   ├── Dockerfile
 │   └── views/
-│       └── index.erb       # Plantilla HTML
+│       └── index.erb           # HTML template
+├── backend/                    # Backend Sinatra app
+│   ├── sinatra.rb              # Sinatra application (JSON API)
+│   ├── version.rb              # Centralized version file
+│   ├── Gemfile
+│   └── Dockerfile
 ├── k8s/
-│   └── ...                 # Manifestos K8s
-└── README.md               # Este archivo
+│   ├── deployment.yaml         # Frontend deployment (3 replicas)
+│   ├── configMaps.yaml         # Environment variables
+│   ├── sinatra-app-ingress.yaml# Nginx ingress
+│   ├── nodeport.yaml           # NodePort service
+│   ├── fileVolume.yaml         # PersistentVolume for visit counter
+│   └── fileVolumeClaim.yaml    # PersistentVolumeClaim
+└── README.md
 ```
 
-## Gestión de Versiones
+## Applications
 
-La versión de la aplicación se gestiona en un único archivo: [`app/version.rb`](app/version.rb)
+### Frontend (`app/`) — port 8080
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /` | Main page with environment variables and visit counter |
+| `GET /health` | Health check endpoint for K8s probes |
+
+**Environment Variables:**
+
+| Variable | Description | Default Value |
+|----------|-------------|---------------|
+| `APP_MESSAGE` | Custom message to display | `"Hola desde K8s!"` |
+| `APP_ENV` | Application environment | `"development"` |
+| `POD_NAME` | Pod name (injected by K8s) | `"local-container"` |
+| `ALLOWED_HOSTS` | Allowed hosts for authorization | `"sinatra-app.example"` |
+
+### Backend (`backend/`) — port 8081
+
+JSON API consumed by the frontend within the cluster.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /` | Returns `{"message": "ok"}` |
+| `GET /health` | Returns `{"status": "healthy", "version": "..."}` |
+
+## Version Management
+
+Each app has its own `version.rb`:
 
 ```ruby
 module VERSION
-  STRING = '1.4.0'
+  STRING = '1.x.x'
 end
 ```
 
-Para actualizar la versión, solo necesitas modificar este archivo y la aplicación lo utilizará automáticamente.
+Modify that file to update the version; the rest of the code uses it automatically.
 
-## Variables de Entorno
-
-| Variable | Descripción | Valor por defecto |
-|----------|-------------|-------------------|
-| `APP_MESSAGE` | Mensaje personalizado a mostrar | "Hola desde K8s!" |
-| `APP_ENV` | Entorno de la aplicación | "development" |
-| `POD_NAME` | Nombre del pod (inyectado por K8s) | "local-container" |
-
-## Uso Local con Docker
-
-### Construir la imagen
+## Local Development with Docker
 
 ```bash
+# Frontend
 docker build -t sinatra-app ./app
-```
-
-### Ejecutar el contenedor
-
-```bash
-# Básico
 docker run -p 8080:8080 sinatra-app
 
-# Con variables de entorno
-docker run -p 8080:8080 \
-  -e APP_MESSAGE="Hola desde Docker!" \
-  -e APP_ENV="production" \
-  sinatra-app
+# Backend
+docker build -t sinatra-backend ./backend
+docker run -p 8081:8081 sinatra-backend
 ```
 
-### Probar la aplicación
+## Kubernetes
 
-Abre en el navegador: http://localhost:8080
+```bash
+# Apply all resources
+kubectl apply -f k8s/
 
-Health check: http://localhost:8080/health
+# Check status
+kubectl get deployments
+kubectl get pods
+kubectl get ingress
 
-## Próximos Pasos para Kubernetes
+# View logs
+kubectl logs -l app=sinatra-app
+```
 
-1. Crear un Deployment YAML
-2. Crear un Service YAML
-3. Configurar ConfigMaps para variables de entorno
-4. Crear Ingress (opcional)
-
-## Endpoints
-
-- `GET /` - Página principal con información de variables de entorno
-- `GET /health` - Health check para probes de K8s
+> The frontend is accessible via Ingress at `sinatra-app.example`. The backend communicates internally through K8s Services.
