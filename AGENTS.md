@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a Kubernetes learning project with two Sinatra (Ruby) applications that communicate with each other inside the same cluster. The **frontend** (`app/`) serves an HTML page with environment info and a visit counter. The **backend** (`backend/`) is a JSON API consumed by the frontend, used to experiment with inter-service communication in K8s.
+This is a Kubernetes learning project with two Sinatra (Ruby) applications that communicate with each other inside the same cluster. The **frontend** (`frontend/`) serves an HTML page with environment info and a visit counter. The **backend** (`backend/`) is a JSON API consumed by the frontend, used to experiment with inter-service communication in K8s.
 
 ## Tech Stack
 
@@ -16,7 +16,7 @@ This is a Kubernetes learning project with two Sinatra (Ruby) applications that 
 
 ```
 k8s-starting/
-├── app/                        # Frontend Sinatra app (port 8080)
+├── frontend/                   # Frontend Sinatra app (port 8080)
 │   ├── app.rb                  # Main Sinatra application
 │   ├── version.rb              # Centralized version file
 │   ├── visit_counter.rb        # File-based persistent visit counter
@@ -46,7 +46,7 @@ k8s-starting/
 
 ## Applications
 
-### Frontend (`app/`) — port 8080
+### Frontend (`frontend/`) — port 8080
 
 | Endpoint | Description |
 |----------|-------------|
@@ -77,7 +77,7 @@ JSON API, intended to be called by the frontend inside the cluster.
 
 ```bash
 # Frontend
-docker build -t sinatra-app ./app
+docker build -t sinatra-app ./frontend
 docker run -p 8080:8080 sinatra-app
 curl http://localhost:8080
 curl http://localhost:8080/health

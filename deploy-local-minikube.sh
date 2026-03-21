@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deployment pipeline script for sinatra-app
-# This script reads the version from app/version.rb and deploys to Kubernetes
+# This script reads the version from frontend/version.rb and deploys to Kubernetes
 
 set -e
 
@@ -13,12 +13,12 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}=== Sinara App Deployment Pipeline ===${NC}"
 
-# Step 1: Extract version from app/version.rb
-echo -e "${YELLOW}[1/3] Extracting version from app/version.rb...${NC}"
-VERSION=$(grep "STRING = " app/version.rb | sed "s/.*STRING = '\(.*\)'/\1/")
+# Step 1: Extract version from frontend/version.rb
+echo -e "${YELLOW}[1/3] Extracting version from frontend/version.rb...${NC}"
+VERSION=$(grep "STRING = " frontend/version.rb | sed "s/.*STRING = '\(.*\)'/\1/")
 
 if [ -z "$VERSION" ]; then
-    echo -e "${RED}ERROR: Could not extract version from app/version.rb${NC}"
+    echo -e "${RED}ERROR: Could not extract version from frontend/version.rb${NC}"
     exit 1
 fi
 
@@ -26,7 +26,7 @@ echo -e "${GREEN}  Version: $VERSION${NC}"
 
 # Step 2: Build Docker image
 echo -e "${YELLOW}[2/3] Building Docker image sinatra-app:$VERSION...${NC}"
-cd app && docker build -t sinatra-app:$VERSION . && cd ..
+cd frontend && docker build -t sinatra-app:$VERSION . && cd ..
 
 
 if [ $? -eq 0 ]; then

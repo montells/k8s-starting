@@ -8,14 +8,14 @@ A Kubernetes learning project with two Sinatra (Ruby) applications that communic
 Internet → Ingress → sinatra-app (frontend, :8080) → sinatra-backend (:8081)
 ```
 
-- **`app/`** — Frontend: serves HTML, displays environment variables and visit counter
+- **`frontend/`** — Frontend: serves HTML, displays environment variables and visit counter
 - **`backend/`** — Backend: JSON API, intended to be consumed by the frontend within the cluster
 
 ## Project Structure
 
 ```
 k8s-starting/
-├── app/                        # Frontend Sinatra app
+├── frontend/                   # Frontend Sinatra app
 │   ├── app.rb                  # Sinatra application
 │   ├── version.rb              # Centralized version file
 │   ├── visit_counter.rb        # File-based persistent visit counter
@@ -44,7 +44,7 @@ k8s-starting/
 
 ## Applications
 
-### Frontend (`app/`) — port 8080
+### Frontend (`frontend/`) — port 8080
 
 | Endpoint | Description |
 |----------|-------------|
@@ -85,7 +85,7 @@ Modify that file to update the version; the rest of the code uses it automatical
 
 ```bash
 # Frontend
-docker build -t sinatra-app ./app
+docker build -t sinatra-app ./frontend
 docker run -p 8080:8080 sinatra-app
 
 # Backend
