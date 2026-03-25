@@ -1,25 +1,22 @@
 <!--
 ## Sync Impact Report
 
-**Version change**: (template) → 1.0.0
-**Created from template**: Initial population — all placeholders resolved.
+**Version change**: 1.0.0 → 1.1.0
+**Amendment**: Added database and ORM constraints to Tech Stack Constraints section.
 
-### Principles established
-- I. Ruby Excellence (OOP, SOLID, DRY)
-- II. Simplicity First (YAGNI)
-- III. Kubernetes Boundary (no-touch zone)
-- IV. Modularity & Separation of Concerns
-- V. Deploy Scripts & Docker in Scope
+### Modified sections
+- Tech Stack Constraints: added ActiveRecord 8 (ORM, backend only) and PostgreSQL 14 (database)
 
-### Added sections
-- Tech Stack Constraints
-- Development Workflow
+### Added principles / sections
+- None
+
+### Removed sections
+- None
 
 ### Templates requiring updates
-- `.specify/templates/plan-template.md` ✅ — no structural changes needed; Constitution Check section
-  aligns with principles above (no test gates removed since tests are out of scope).
-- `.specify/templates/spec-template.md` ✅ — testing sections already marked OPTIONAL.
-- `.specify/templates/tasks-template.md` ✅ — test tasks already marked OPTIONAL.
+- `.specify/templates/plan-template.md` ✅ — Storage field in Technical Context will capture PostgreSQL 14; no structural change needed.
+- `.specify/templates/spec-template.md` ✅ — No structural change needed.
+- `.specify/templates/tasks-template.md` ✅ — Phase 2 Foundational already covers DB setup tasks; no structural change needed.
 
 ### Deferred TODOs
 - None. All placeholders resolved.
@@ -96,6 +93,11 @@ and runtime behavior documented in `README.md` and `AGENTS.md`.
 - **Web Framework**: Sinatra. Rails or other full-stack frameworks are PROHIBITED.
 - **Web Server**: Puma with Rackup.
 - **Base Docker Image**: `ruby:3.2-alpine` to keep images minimal.
+- **ORM**: ActiveRecord 8. Used exclusively in `backend/` for database access.
+  The `frontend/` app MUST NOT connect to or query any database directly.
+- **Database**: PostgreSQL 14. Only the `backend/` application connects to the database.
+  All database configuration (host, port, credentials, database name) MUST be supplied
+  via environment variables — never hardcoded.
 - **Testing**: No automated test suite is required or expected. Quality is achieved through
   clean OOP design and code review, not test coverage.
 - **Dependencies**: Gemfile additions MUST be justified by actual feature need. Dev-only gems
@@ -128,4 +130,4 @@ All feature work MUST comply with these principles before implementation begins.
 The `AGENTS.md` file serves as the runtime development reference for agents working in
 this repository.
 
-**Version**: 1.0.0 | **Ratified**: 2026-03-25 | **Last Amended**: 2026-03-25
+**Version**: 1.1.0 | **Ratified**: 2026-03-25 | **Last Amended**: 2026-03-25
