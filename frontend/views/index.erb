@@ -42,6 +42,19 @@
       font-weight: bold;
       text-transform: uppercase;
     }
+    .env-var.project-success {
+      background-color: #e8f8e8;
+    }
+    .env-var.project-error {
+      background-color: #f8e8e8;
+    }
+    .value.error {
+      color: #cc0000;
+      font-weight: bold;
+    }
+    .project-field {
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -78,6 +91,24 @@
       <span class="label">Backend Response:</span>
       <span class="value backend"><%= @backend_response %></span>
     </div>
+
+    <!-- Project Details -->
+    <% if @project_error %>
+      <div class="env-var project-error">
+        <span class="label">Project #1 Error:</span>
+        <span class="value error"><%= @project_error %></span>
+      </div>
+    <% else %>
+      <div class="env-var project-success">
+        <span class="label">Project #1:</span>
+        <% (@project_details || {}).each do |field, value| %>
+          <div class="project-field">
+            <span class="label"><%= field %>:</span>
+            <span class="value"><%= value %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </body>
 </html>

@@ -27,6 +27,12 @@ def fetch_backend_response
   response['message'] || response
 end
 
+# Fetches project details from the backend by id
+def fetch_project_details(id)
+  backend_url = ENV.fetch('BACKEND_URL', 'http://localhost:8081')
+  BackendClient.fetch(backend_url, "/project/#{id}")
+end
+
 # Root route - renders the index template
 get '/' do
   # Increment the visit count
@@ -40,7 +46,15 @@ get '/' do
   
   # Fetch backend response
   @backend_response = fetch_backend_response
-  
+
+  # Fetch project details for id 1
+  project_result = fetch_project_details(1)
+  if project_result.key?('error') || project_result.key?(:error)
+    @project_error = project_result['error'] || project_result[:error]
+  else
+    @project_details = project_result['project']
+  end
+
   erb :index
 end
 
