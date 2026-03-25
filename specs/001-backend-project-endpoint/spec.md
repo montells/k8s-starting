@@ -78,7 +78,7 @@ The database configured for the application does not exist. The backend returns 
 
 ### Functional Requirements
 
-- **FR-001**: The backend MUST expose a GET endpoint at `/project/:id` that accepts an ID parameter and returns project data in JSON format.
+- **FR-001**: The backend MUST expose a GET endpoint at `/project/:id` (unversioned) that accepts an ID parameter and returns project data in JSON format.
 - **FR-002**: When a project with the given `:id` is found, the system MUST return HTTP 200 with a JSON body wrapping the project data under a `"project"` key (e.g., `{"project": {"id": 1, "name": "...", "description": "...", "status": "active"}}`).
 - **FR-003**: When no project with the given `:id` exists, the system MUST return HTTP 404 with a descriptive JSON error message.
 - **FR-004**: When the database is unreachable or the connection fails, the system MUST return HTTP 503 with a descriptive JSON error message.
@@ -92,14 +92,14 @@ The database configured for the application does not exist. The backend returns 
 
 ### Key Entities
 
-- **Project**: Represents a project record stored in the database. Attributes: `id` (unique identifier), `name` (project name), `description` (project description), `status` (lifecycle state: active or inactive).
+- **Project**: Represents a project record stored in the database. Attributes: `id` (integer, serial/bigserial primary key, auto-increment), `name` (project name), `description` (project description), `status` (lifecycle state: active or inactive).
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: Every request to `/project/:id` receives a JSON response — no request is left unanswered or causes an application crash.
-- **SC-002**: A valid project ID returns the correct project data within an acceptable response time (under 2 seconds under normal conditions).
+- **SC-002**: A valid project ID returns the correct project data within an acceptable response time (under 2 seconds under normal conditions). Database connection timeout is set to 5 seconds; error responses under failure conditions must be returned within that timeout.
 - **SC-003**: A non-existent project ID consistently returns a 404 JSON error response.
 - **SC-004**: Under simulated database failure conditions, 100% of requests to `/project/:id` receive a JSON error response and the application remains operational for subsequent requests.
 - **SC-005**: Each error scenario (not found, connection failure, database missing) produces a distinct, meaningful JSON error message that communicates the cause of the failure clearly.
@@ -109,6 +109,9 @@ The database configured for the application does not exist. The backend returns 
 ### Session 2026-03-25
 
 - Q: What fields does the Project entity have? → A: `id`, `name`, `description`, `status` (active/inactive)
+- Q: What type is the Project `id` field? → A: Integer (serial/bigserial auto-increment primary key)
+- Q: What database connection timeout should be configured before returning 503? → A: 5 seconds
+- Q: Should the endpoint be versioned (e.g., /v1/project/:id)? → A: No versioning — route stays /project/:id
 - Q: How should a non-numeric `:id` (e.g., `/project/abc`) be handled? → A: HTTP 400 with a JSON error indicating invalid ID format
 - Q: What is the JSON response structure for a found project? → A: Wrapped under `"project"` key: `{"project": {"id": ..., "name": ..., "description": ..., "status": ...}}`
 - Q: Should errors be logged? → A: Yes — all errors (connection failures, not-found, bad input) logged to standard output
