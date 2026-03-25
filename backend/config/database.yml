@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  host: <%= ENV.fetch('DB_HOST', 'localhost') %>
+  port: <%= ENV.fetch('DB_PORT', '5432').to_i %>
+  username: <%= ENV.fetch('DB_USER', 'sinatra_backend_user') %>
+  password: <%= ENV.fetch('DB_PASSWORD', '') %>
+  connect_timeout: 5
+  pool: <%= ENV.fetch('DB_POOL', '5').to_i %>
+
+development:
+  <<: *default
+  database: sinatra_backend_development
+
+production:
+  <<: *default
+  database: sinatra_backend_production

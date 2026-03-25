@@ -1,7 +1,7 @@
 FROM ruby:3.2-alpine
 
 # Install dependencies
-RUN apk add --no-cache build-base
+RUN apk add --no-cache build-base postgresql-dev
 
 # Set working directory
 WORKDIR /sinatra

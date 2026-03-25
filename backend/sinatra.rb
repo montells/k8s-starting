@@ -2,6 +2,8 @@
 
 require 'sinatra'
 require_relative 'version'
+require_relative 'config/database'
+require_relative 'services/project_finder'
 
 set :port, 8081
 set :bind, '0.0.0.0'
@@ -31,4 +33,21 @@ get '/health' do
     status: "healthy",
     version: VERSION::STRING,
   }.to_json
+end
+
+get '/project/:id' do
+  unless params[:id] =~ /\A\d+\z/
+    $stdout.puts "[ERROR] Invalid project ID format: #{params[:id]}"
+    halt 400, { error: 'Invalid project ID format' }.to_json
+  end
+
+  result = ProjectFinder.new.find(params[:id].to_i)
+
+  if result[:success]
+    status 200
+    { project: result[:project] }.to_json
+  else
+    status result[:status]
+    { error: result[:error] }.to_json
+  end
 end

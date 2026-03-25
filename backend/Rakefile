@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+require 'active_record'
+require 'pg'
+require_relative 'config/database'
+
+MIGRATIONS_PATH = File.join(__dir__, 'db', 'migrate')
+SCHEMA_PATH     = File.join(__dir__, 'db', 'schema.rb')
+
+namespace :db do
+  desc 'Create the application database'
+  task :create do
+    config  = DatabaseConfig.load_config
+    db_name = config['database']
+    conn    = PG.connect(
+      host:     config['host'],
+      port:     config['port'],
+      user:     config['username'],
+      password: config['password'],
+      dbname:   'postgres'
+    )
+    conn.exec("CREATE DATABASE #{conn.escape_identifier(db_name)}")
+    conn.close
+    puts "Database '#{db_name}' created."
+  rescue PG::DuplicateDatabase
+    puts "Database '#{db_name}' already exists."
+  end
+
+  desc 'Drop the application database'
+  task :drop do
+    config  = DatabaseConfig.load_config
+    db_name = config['database']
+    conn    = PG.connect(
+      host:     config['host'],
+      port:     config['port'],
+      user:     config['username'],
+      password: config['password'],
+      dbname:   'postgres'
+    )
+    conn.exec("DROP DATABASE IF EXISTS #{conn.escape_identifier(db_name)}")
+    conn.close
+    puts "Database '#{db_name}' dropped."
+  end
+
+  desc 'Run all pending migrations'
+  task :migrate do
+    ActiveRecord::MigrationContext.new(MIGRATIONS_PATH).migrate
+    Rake::Task['db:schema:dump'].invoke
+    puts 'Migrations complete.'
+  end
+
+  desc 'Rollback the last migration'
+  task :rollback do
+    ActiveRecord::MigrationContext.new(MIGRATIONS_PATH).rollback
+    Rake::Task['db:schema:dump'].invoke
+    puts 'Rolled back.'
+  end
+
+  namespace :schema do
+    desc 'Dump current schema to db/schema.rb'
+    task :dump do
+      File.open(SCHEMA_PATH, 'w') do |f|
+        ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection_pool, f)
+      end
+      puts "Schema dumped to #{SCHEMA_PATH}."
+    end
+  end
+end
