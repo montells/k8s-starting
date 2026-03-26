@@ -1,7 +1,10 @@
-FROM ruby:3.2-alpine
+FROM ruby:3.2-slim
 
 # Install dependencies
-RUN apk add --no-cache build-base postgresql-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /sinatra
