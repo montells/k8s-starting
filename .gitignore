@@ -17,3 +17,6 @@ tmp/
 Thumbs.db
 *.swp
 *.tmp
+
+# Ignore Kubernetes secrets
+k8s/backend/secret.yaml
