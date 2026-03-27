@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sinatra-backend-config
+data:
+  DB_HOST: "postgres-backend-svc"
+  POSTGRES_DB: sinatra_backend_development
+  POSTGRES_USER: sinatra_backend_user

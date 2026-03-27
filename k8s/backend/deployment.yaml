@@ -18,3 +18,8 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 8081
+        envFrom:
+        - configMapRef:
+            name: sinatra-backend-config
+        - secretRef:
+            name: sinatra-backend-secret
