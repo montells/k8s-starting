@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sinatra-backend-statefulset
+spec:
+  serviceName: sinatra-backend-sts-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sinatra-postgres
+  template:
+    metadata:
+      labels:
+        app: sinatra-postgres
+    spec:
+      containers:
+      - name: sinatra-postgres-container
+        image: postgres:14-alpine
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - configMapRef:
+            name: sinatra-backend-config
+        - secretRef:
+            name: sinatra-backend-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sinatra-backend-sts-svc
+spec:
+  selector:
+    app: sinatra-postgres
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
