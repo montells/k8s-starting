@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: sinatra-backend-config
 data:
-  DB_HOST: "postgres-backend-svc"
+  DB_HOST: "sinatra-backend-sts-svc"
   POSTGRES_DB: sinatra_backend_development
   POSTGRES_USER: sinatra_backend_user
