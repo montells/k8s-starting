@@ -23,6 +23,13 @@ spec:
             name: sinatra-backend-config
         - secretRef:
             name: sinatra-backend-secret
+        volumeMounts:
+        - name: sinatra-backend-pg-volume
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: sinatra-backend-pg-volume
+        persistentVolumeClaim:
+          claimName: sinatra-backend-pg-pvc
 
 ---
 apiVersion: v1
